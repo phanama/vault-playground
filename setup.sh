@@ -19,6 +19,7 @@ done
 #create users and map users to policies
 vault write auth/userpass/users/app1 password=app1vaultpassword policies=app1
 vault write auth/userpass/users/app2 password=app2vaultpassword policies=app2
+vault write auth/userpass/users/app3 password=app3vaultpassword policies=app3
 vault write auth/userpass/users/almighty password=almightyvaultpassword policies=almighty
 
 docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -v "$PWD":/tmp/postgres --restart=always -d postgres
@@ -28,3 +29,23 @@ docker exec postgres psql -U postgres -d app1database -f /tmp/postgres/create_ap
 docker exec postgres psql -U postgres -d app1database -f /tmp/postgres/populate_app1.sql
 docker exec postgres psql -U postgres -d app2database -f /tmp/postgres/create_app2.sql
 docker exec postgres psql -U postgres -d app2database -f /tmp/postgres/populate_app2.sql
+docker exec postgres psql -U postgres -d app3database -f /tmp/postgres/create_app3.sql
+docker exec postgres psql -U postgres -d app3database -f /tmp/postgres/populate_app3.sql
+
+#vault dynamic postgres credentials
+vault secrets enable database
+
+#create app roles
+vault write database/config/app1postgres \
+    plugin_name=postgresql-database-plugin \
+    allowed_roles="app3" \
+    connection_url="postgresql://{{username}}:{{password}}@localhost:5432/" \
+    username="postgres" \
+    password="postgres"
+
+vault write database/roles/app3 \
+    db_name="app3database" \
+    creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
+    default_ttl="10s" \
+    max_ttl="30s"
