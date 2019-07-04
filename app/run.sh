@@ -3,7 +3,8 @@
 set -eu
 
 export VAULT_ADDR=http://127.0.0.1:8200
-APP="$1"
+export APP="$1"
+export APP_PORT="$2"
 
 VAULT_PASSWORD="${APP}vaultpassword"
 
