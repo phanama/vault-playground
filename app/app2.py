@@ -7,7 +7,6 @@ password = os.environ['POSTGRES_PASSWORD']
 hostname = os.environ['POSTGRES_HOSTNAME']
 port = os.environ['POSTGRES_PORT']
 database = os.environ['POSTGRES_DATABASE']
-database = 'app1database'
 
 try:
     connection = psycopg2.connect(user = username,
