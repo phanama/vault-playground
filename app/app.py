@@ -2,16 +2,28 @@ import psycopg2
 import os
 import logging
 from flask import Flask
+import sys
 
 app = Flask(__name__)
+app_port = None
+app_name = None
+username = None
+password = None
+hostname = None
+port = None
+database = None
 
-app_port = os.environ['APP_PORT']
-app_name = os.environ['APP']
-username = os.environ['POSTGRES_USERNAME']
-password = os.environ['POSTGRES_PASSWORD']
-hostname = os.environ['POSTGRES_HOSTNAME']
-port = os.environ['POSTGRES_PORT']
-database = os.environ['POSTGRES_DATABASE']
+try:
+    app_port = os.environ['APP_PORT']
+    app_name = os.environ['APP_NAME']
+    username = os.environ['POSTGRES_USERNAME']
+    password = os.environ['POSTGRES_PASSWORD']
+    hostname = os.environ['POSTGRES_HOSTNAME']
+    port = os.environ['POSTGRES_PORT']
+    database = os.environ['POSTGRES_DATABASE']
+except (Exception, KeyError) as e:
+    logging.error(e)
+    sys.exit(1)
 
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
@@ -34,7 +46,7 @@ def get_one_customer() -> str:
 
 @app.route("/")
 def home():
-    return "app1"
+    return app_name
     
 if __name__ == "__main__":
     app.run(debug=True, port=app_port)
