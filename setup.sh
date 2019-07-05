@@ -56,7 +56,8 @@ vault write database/config/app3database \
 
 vault write database/roles/app3 \
     db_name="app3database" \
-    creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
-        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
-    default_ttl="30s" \
+    creation_statements="CREATE ROLE \"{{name}}\" WITH SUPERUSER LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}';"
+    default_ttl="10s" \
     max_ttl="30s"
+
+vault audit enable file file_path=vault_audit.log

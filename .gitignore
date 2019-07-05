@@ -5,3 +5,4 @@ venv/
 .vscode/
 server.*
 rootCA.*
+vault_audit.log

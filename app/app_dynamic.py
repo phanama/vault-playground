@@ -28,11 +28,17 @@ hostname = '127.0.0.1'
 port = 5432
 database = 'app3database'
 
+postgres_credentials = None
+try:
+    postgres_credentials = fetch_credentials(app_name)
+except Exception as e:
+    logging.error(e)
+username = postgres_credentials['data']['username']
+password = postgres_credentials['data']['password']
+
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
-    postgres_credentials = fetch_credentials(app_name)
-    username = postgres_credentials['data']['username']
-    password = postgres_credentials['data']['password']
+    connection = None
     try:
         connection = psycopg2.connect(user = username,
                                     password = password,
@@ -45,11 +51,11 @@ def get_one_customer() -> str:
         return '{0}:{1} -> {2}'.format(app_name, app_port, record[0])
     except (Exception, psycopg2.Error) as error :
         logging.error("Error while connecting to PostgreSQL", error)
-        return 'Error'
+        return 'Error: {}'.format(error)
     finally:
-            if(connection):
-                cursor.close()
-                connection.close()
+        if(connection):
+            cursor.close()
+            connection.close()
 
 @app.route("/")
 def home():

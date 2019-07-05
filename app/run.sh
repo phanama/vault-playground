@@ -8,7 +8,7 @@ export APP_PORT="$2"
 DYNAMIC=$3
 
 
-if [ -z "$DYNAMIC" ]; then
+if [ "$DYNAMIC" == "false" ]; then
     VAULT_PASSWORD="${APP_NAME}vaultpassword"
 
     #VAULT_TOKEN=$(curl --silent -XPOST http://$VAULT_ADDRESS/v1/auth/userpass/login/$APP_NAME/ -d '{"password": "'$VAULT_PASSWORD'"}' | jq -r '.auth.client_token') 
