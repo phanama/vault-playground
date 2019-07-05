@@ -22,7 +22,17 @@ vault write auth/userpass/users/app2 password=app2vaultpassword policies=app2
 vault write auth/userpass/users/app3 password=app3vaultpassword policies=app3
 vault write auth/userpass/users/almighty password=almightyvaultpassword policies=almighty
 
-docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -v "$PWD":/tmp/postgres --restart=always -d postgres
+openssl genrsa -out rootCA.key 4096
+openssl req -x509 -new -nodes -key rootCA.key -subj "/CN=localhost" -sha256 -days 1024 -out rootCA.crt
+openssl genrsa -out server.key 2048
+openssl req -new -sha256 -key server.key -subj "/CN=localhost" -out server.req
+openssl x509 -req -in server.req -CA rootCA.crt -CAkey rootCA.key -CAcreateserial -out server.crt -days 500 -sha256
+chmod 0600 server.key
+
+docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres --name postgres -v "$PWD":/tmp/postgres --restart=always -d \
+    -v $PWD/server.crt:/var/lib/postgresql/server.crt:ro \
+    -v $PWD/server.key:/var/lib/postgresql/server.key:ro \
+    postgres -c ssl=on -c ssl_cert_file=/var/lib/postgresql/server.crt -c ssl_key_file=/var/lib/postgresql/server.key
 sleep 5
 docker exec postgres psql -U postgres -f /tmp/postgres/init.sql
 docker exec postgres psql -U postgres -d app1database -f /tmp/postgres/create_app1.sql
@@ -36,10 +46,11 @@ docker exec postgres psql -U postgres -d app3database -f /tmp/postgres/populate_
 vault secrets enable database
 
 #create app roles
-vault write database/config/app1postgres \
+vault write database/config/app3database \
     plugin_name=postgresql-database-plugin \
     allowed_roles="app3" \
     connection_url="postgresql://{{username}}:{{password}}@localhost:5432/" \
+    verify_connection=false \
     username="postgres" \
     password="postgres"
 

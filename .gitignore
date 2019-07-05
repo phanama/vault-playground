@@ -3,3 +3,5 @@ venv/
 .notes.swp
 .notes
 .vscode/
+server.*
+rootCA.*
