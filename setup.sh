@@ -1,7 +1,7 @@
 export VAULT_ADDR="http://127.0.0.1:8200"
 
 #enable kv secrets
-vault secrets enable -path=kv kv
+vault secrets enable -path=kv -version=2 kv
 #enable userpass auth -> not for production
 vault auth enable -path=userpass userpass
 
