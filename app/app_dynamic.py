@@ -16,13 +16,16 @@ except Exception as e:
     logging.error(e)
 vault_addr = 'http://127.0.0.1:8200'
 vault_client = hvac.Client(url=vault_addr)
-vault_client.auth_userpass(app_name, '{}vaultpassword'.format(app_name), mount_point='userpass')
+vault_client.auth_userpass(app_name, '{}vaultpassword'.format(
+    app_name), mount_point='userpass')
+
 
 def fetch_credentials(app_name: str):
     return vault_client.secrets.database.generate_credentials(
         mount_point='database',
         name=app_name
     )
+
 
 hostname = '127.0.0.1'
 port = 5432
@@ -36,20 +39,21 @@ except Exception as e:
 username = postgres_credentials['data']['username']
 password = postgres_credentials['data']['password']
 
+
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
     connection = None
     try:
-        connection = psycopg2.connect(user = username,
-                                    password = password,
-                                    host = hostname,
-                                    port = port,
-                                    database = database)
+        connection = psycopg2.connect(user=username,
+                                      password=password,
+                                      host=hostname,
+                                      port=port,
+                                      database=database)
         cursor = connection.cursor()
         cursor.execute("SELECT cust_name FROM CUSTOMERS LIMIT 1;")
         record = cursor.fetchone()
         return '{0}:{1} -> {2}'.format(app_name, app_port, record[0])
-    except (Exception, psycopg2.Error) as error :
+    except (Exception, psycopg2.Error) as error:
         logging.error("Error while connecting to PostgreSQL", error)
         return 'Error: {}'.format(error)
     finally:
@@ -57,9 +61,11 @@ def get_one_customer() -> str:
             cursor.close()
             connection.close()
 
+
 @app.route("/")
 def home():
     return app_name
-    
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=app_port)

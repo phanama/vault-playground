@@ -25,29 +25,32 @@ except (Exception, KeyError) as e:
     logging.error(e)
     sys.exit(1)
 
+
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
     try:
-        connection = psycopg2.connect(user = username,
-                                    password = password,
-                                    host = hostname,
-                                    port = port,
-                                    database = database)
+        connection = psycopg2.connect(user=username,
+                                      password=password,
+                                      host=hostname,
+                                      port=port,
+                                      database=database)
         cursor = connection.cursor()
         cursor.execute("SELECT cust_name FROM CUSTOMERS LIMIT 1;")
         record = cursor.fetchone()
         return '{0}:{1} -> {2}'.format(app_name, app_port, record[0])
-    except (Exception, psycopg2.Error) as error :
+    except (Exception, psycopg2.Error) as error:
         logging.error("Error while connecting to PostgreSQL", error)
         return 'Error'
     finally:
-            if(connection):
-                cursor.close()
-                connection.close()
+        if(connection):
+            cursor.close()
+            connection.close()
+
 
 @app.route("/")
 def home():
     return app_name
-    
+
+
 if __name__ == "__main__":
     app.run(debug=True, port=app_port)
