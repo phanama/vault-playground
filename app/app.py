@@ -39,6 +39,7 @@ def get_one_customer() -> str:
         return '{0}:{1} -> {2}'.format(app_name, app_port, record[0])
     except (Exception, psycopg2.Error) as error :
         logging.error("Error while connecting to PostgreSQL", error)
+        return 'Error'
     finally:
             if(connection):
                 cursor.close()

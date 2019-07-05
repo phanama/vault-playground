@@ -58,5 +58,5 @@ vault write database/roles/app3 \
     db_name="app3database" \
     creation_statements="CREATE ROLE \"{{name}}\" WITH LOGIN PASSWORD '{{password}}' VALID UNTIL '{{expiration}}'; \
         GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO \"{{name}}\";" \
-    default_ttl="10s" \
+    default_ttl="30s" \
     max_ttl="30s"
