@@ -13,7 +13,7 @@ Requirements:
 
 To setup and run the app:
 - Setup virtualenv `virtualenv venv && source ./venv/bin/activate`
-- Install requirements `pip install -r requirements`
+- Install requirements `pip install -r requirements.txt`
 - Run vault in another terminal `vault server -dev`
 - Setup vault data, roles, and policies, and setup postgres with data `./setup.sh`
 - Run the app. `./app/run.sh APP_NAME APP_PORT IS_DYNAMIC` E.g. `./app/run.sh app1 5001 false`
