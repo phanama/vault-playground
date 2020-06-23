@@ -15,12 +15,15 @@ try:
 except Exception as e:
     logging.error(e)
 vault_addr = 'http://127.0.0.1:8200'
+#bootstrap the vault client
 vault_client = hvac.Client(url=vault_addr)
 vault_client.auth_userpass(app_name, '{}vaultpassword'.format(
     app_name), mount_point='userpass')
 
 
 def fetch_credentials(app_name: str):
+    '''Fetch credentials from vault server
+    '''
     return vault_client.secrets.database.generate_credentials(
         mount_point='database',
         name=app_name
@@ -31,6 +34,7 @@ hostname = '127.0.0.1'
 port = 5432
 database = 'app3database'
 
+#fetch the credentials for postgres from the vault server
 postgres_credentials = None
 try:
     postgres_credentials = fetch_credentials(app_name)
@@ -42,6 +46,9 @@ password = postgres_credentials['data']['password']
 
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
+    '''Get one customer from the database
+       Demonstrates static pre-fetched credentials being used.
+    '''
     connection = None
     try:
         connection = psycopg2.connect(user=username,
