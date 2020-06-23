@@ -1,3 +1,4 @@
+#Demonstrates using app config/secret without vault
 import psycopg2
 import os
 import logging
@@ -13,6 +14,7 @@ hostname = None
 port = None
 database = None
 
+#bootstrap app config from OS env vars without fetching from vault
 try:
     app_port = os.environ['APP_PORT']
     app_name = os.environ['APP_NAME']
@@ -28,6 +30,9 @@ except (Exception, KeyError) as e:
 
 @app.route('/get_one_customer')
 def get_one_customer() -> str:
+    '''Fetch one customer from the database using the credentials set previously
+       through OS env vars.
+    '''
     try:
         connection = psycopg2.connect(user=username,
                                       password=password,
